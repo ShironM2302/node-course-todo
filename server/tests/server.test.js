@@ -1,18 +1,20 @@
+//external libraries
 var request = require('supertest');
 var expect = require('expect');
 
+//local dependcies
 var {app} = require('./../server.js');
 var {Todo} = require('./../models/todo');
 
 //dummy todo
-
 const todos = [{
     text:"Something to do"
 },
 {
     text:"dinner date"
 }];
-//wiping database, so test case below works every time
+
+//wiping database, and then adding dummy todo for relevant tests
 beforeEach((done) => {
     Todo.remove({}).then(() => {
     return Todo.insertMany(todos);
@@ -24,7 +26,6 @@ describe('POST /todos', () => {
     //test case for creating a todo
     it('should create a new todo', (done) => {
         var text = "test todo text";
-
         request(app)
             .post('/todos')
             .send({text}) //make variable into object/json
@@ -64,7 +65,7 @@ describe('POST /todos', () => {
     });
 });
 
-
+//test cases of post todo
 describe('/GET Todos', () => {
     it('should get all todos', (done) => {
         request(app)
