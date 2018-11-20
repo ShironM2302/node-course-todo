@@ -1,6 +1,7 @@
 //external libraries
 var request = require('supertest');
 var expect = require('expect');
+const {ObjectId} = require('mongodb');
 
 //local dependcies
 var {app} = require('./../server.js');
@@ -8,9 +9,11 @@ var {Todo} = require('./../models/todo');
 
 //dummy todo
 const todos = [{
+    _id: new ObjectId(),
     text:"Something to do"
 },
 {
+    _id: new ObjectId(),
     text:"dinner date"
 }];
 
@@ -47,7 +50,6 @@ describe('POST /todos', () => {
     });
 
     it('should not create a todo with an inavild body data', (done) => {
-
         request(app)
         .post('/todos')
         .send({}) 
@@ -66,7 +68,7 @@ describe('POST /todos', () => {
 });
 
 //test cases of post todo
-describe('/GET Todos', () => {
+describe('GET /todos', () => {
     it('should get all todos', (done) => {
         request(app)
             .get('/todos')
@@ -74,6 +76,34 @@ describe('/GET Todos', () => {
             .expect((res) => {
                 expect(res.body.todos.length).toBe(2);
             })
+            .end(done)
+    });
+});
+
+//test cases of GET by ID
+describe('/GET /todos/:id', () => {
+    it('should return correct todo by id', (done) => {
+        request(app)
+            .get(`/todos/${todos[0]._id.toHexString()}`) //onhexstring function changes object to string
+            .expect(200)
+            .expect((res) => {
+                expect(res.body.todo.text).toBe(todos[0].text); //is response matching the dummy model above as we are looking for the first one
+            })
+            .end(done)
+    });
+
+    it('should return 404 if no todo is found', (done) => {
+        var hexID = new ObjectId().toHexString();
+        request(app)
+            .get(`/todos/${hexID}`)
+            .expect(404)
+            .end(done)
+    });
+
+    it('should return 404 if non-obect ids around', (done) => {
+        request(app)
+            .get(`/todos/123`)
+            .expect(404)
             .end(done)
     });
 });
