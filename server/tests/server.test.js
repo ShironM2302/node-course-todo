@@ -2,6 +2,7 @@
 var request = require('supertest');
 var expect = require('expect');
 const {ObjectId} = require('mongodb');
+const _ = require('lodash');
 
 //local dependcies
 var {app} = require('./../server.js');
